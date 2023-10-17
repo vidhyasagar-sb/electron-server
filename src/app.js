@@ -50,13 +50,12 @@ const startServerButton = document.querySelector('.startServerBtn');
 const serverBtn = document.getElementById('serverInteractionButton');
 
 startServerButton.addEventListener('click', () => {
-  console.log('workss');
   try {
-    console.log(
-      serverBtn.value == 'start-server',
-      serverBtn.innerText,
-      serverBtn
-    );
+    // console.log(
+    //   serverBtn.value == 'start-server',
+    //   serverBtn.innerText,
+    //   serverBtn
+    // );
     if (serverBtn.innerText == 'Start Server') {
       ipcRenderer.send('start-server');
       makeLogs('Server Started');
@@ -71,4 +70,8 @@ startServerButton.addEventListener('click', () => {
     makeLogs('Something went wrong when starting server');
     console.log(error);
   }
+});
+
+ipcRenderer.on('server-output', (event, data) => {
+  makeLogs('dataaaa');
 });

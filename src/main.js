@@ -9,19 +9,42 @@ import env from 'env';
 
 // Import the Express.js server
 import express from 'express';
-import server from './server';
+import server from './server'; // Change the path as needed
 
 if (env.name !== 'production') {
   const userDataPath = app.getPath('userData');
   app.setPath('userData', `${userDataPath} (${env.name})`);
 }
 
-const setApplicationMenu = () => {
-  const menus = [appMenuTemplate, editMenuTemplate];
-  if (env.name !== 'production') {
-    menus.push(devMenuTemplate);
+const port = 6678;
+
+// Define a function to check if the server is running
+function isServerRunning() {
+  // Run a command to check if the server is listening on the port
+  const checkServer = spawn('lsof', ['-i', `:${port}`]);
+
+  return new Promise((resolve) => {
+    checkServer.on('close', (code) => {
+      resolve(code === 0); // Code 0 means the port is in use (server is running)
+    });
+  });
+}
+
+async function startServer() {
+  const serverIsRunning = await isServerRunning();
+
+  if (!serverIsRunning) {
+    // Start the server if it's not running
+    server.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } else {
+    console.log('Server is already running.');
   }
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
+}
+
+const setApplicationMenu = () => {
+  Menu.setApplicationMenu(Menu.buildFromTemplate([]));
 };
 
 const initIpc = () => {
@@ -31,23 +54,21 @@ const initIpc = () => {
   ipcMain.on('open-external-link', (event, href) => {
     shell.openExternal(href);
   });
-
-  // ipcMain.on('start-server', () => {
-  //   server.listen(6678);
-  // });
 };
 
 app.on('ready', () => {
   setApplicationMenu();
   initIpc();
+  startServer();
+
+  // server.listen(6678);
 
   const mainWindow = createWindow('main', {
-    width: 1000,
-    height: 600,
+    // width: 10,
+    // height: 60,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: env.name === 'test',
     },
   });
 
