@@ -1,15 +1,28 @@
 {
-  "name": "electron-boilerplate",
-  "productName": "Electron Boilerplate",
-  "description": "Starter for your Electron application",
+  "name": "odin-server",
+  "productName": "Odin Server",
+  "description": "Odin Server of Simple Energy to flash and provision vehicles",
   "version": "0.0.0",
   "private": true,
-  "author": "Mr. Gumby <mr.gumby@example.com>",
-  "copyright": "© 2017, Gumby inc.",
-  "homepage": "http://example.com",
+  "author": "Vidhyasagar <vidhyasagar.r@simpleenergy.in>",
+  "copyright": "© 2023, Simple Energy",
+  "homepage": "https://simpleenergy.in",
   "main": "app/main.js",
   "build": {
-    "appId": "com.example.electron-boilerplate",
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "icon": "simple.png"
+    },
+    "win": {
+      "target": "portable",
+      "icon": "__dirname/../resources/simple.ico"
+    },
+    "portable": {
+      "artifactName": "odin_server.exe"
+    },
+    "appId": "com.simpleenergy.odinserver",
     "files": [
       "app/**/*",
       "node_modules/**/*",
@@ -21,8 +34,10 @@
     "publish": null
   },
   "scripts": {
-    "build": "electron-builder --linux deb",
+    "dist": "build",
+    "build": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
+    "clean": "electron-builder --clear-cache",
     "preunit": "webpack --config=build/webpack.unit.config.js --env=test",
     "unit": "electron-mocha temp/specs.js --renderer --color --require source-map-support/register",
     "pree2e": "webpack --config=build/webpack.app.config.js --env=test && webpack --config=build/webpack.e2e.config.js --env=test",
@@ -33,11 +48,12 @@
   },
   "dependencies": {
     "adbkit": "^2.11.1",
+    "bluebird": "^3.7.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "fs-jetpack": "^4.1.0",
-    "node-fetch": "^2.7.0",
-    "xterm": "^5.3.0"
+    "net": "^1.0.2",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",

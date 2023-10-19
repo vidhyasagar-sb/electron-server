@@ -1,15 +1,13 @@
 import path from 'path';
 import url from 'url';
-import { app, Menu, ipcMain, shell } from 'electron';
+import { app, Menu, ipcMain, shell, BrowserWindow } from 'electron';
 import appMenuTemplate from './menu/app_menu_template';
-import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
-import createWindow from './helpers/window';
 import env from 'env';
 
-// Import the Express.js server
-import express from 'express';
 import server from './server';
+
+const portToConnect = 6678;
 
 if (env.name !== 'production') {
   const userDataPath = app.getPath('userData');
@@ -17,7 +15,7 @@ if (env.name !== 'production') {
 }
 
 const setApplicationMenu = () => {
-  const menus = [appMenuTemplate, editMenuTemplate];
+  const menus = [appMenuTemplate];
   if (env.name !== 'production') {
     menus.push(devMenuTemplate);
   }
@@ -31,25 +29,19 @@ const initIpc = () => {
   ipcMain.on('open-external-link', (event, href) => {
     shell.openExternal(href);
   });
-
-  // ipcMain.on('start-server', () => {
-  //   server.listen(6678);
-  // });
 };
 
 app.on('ready', () => {
   setApplicationMenu();
   initIpc();
-
-  const mainWindow = createWindow('main', {
-    width: 1000,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: env.name === 'test',
-    },
+  server.listen(portToConnect);
+  let mainWindow = new BrowserWindow({
+    width: 100,
+    height: 100,
+    resizable: false,
   });
+
+  mainWindow.setMenu(null);
 
   mainWindow.loadURL(
     url.format({
@@ -59,9 +51,13 @@ app.on('ready', () => {
     })
   );
 
-  if (env.name === 'development') {
-    mainWindow.openDevTools();
-  }
+  // if (env.name === "development") {
+  //   mainWindow.openDevTools();
+  // }
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 });
 
 app.on('window-all-closed', () => {
